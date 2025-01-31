@@ -1,100 +1,71 @@
-# Time Lock on Bitcoin
-A time lock mechanism for Bitcoin that allows you to lock funds on the Bitcoin blockchain for a specified period. This project provides a smart way to control the release of funds by making them unavailable until a certain block height or timestamp is reached.
+# AI AGENT FOR BITCOIN PRICES WITH SUPPORT FOR ALL LANGUAGES
+- It fetches bitcoin prices with caching and rate-limiting
+- It responds to any language-but the response is always in English
+- Uses LLaMA 3.1 8B from TogetherAI
 
-## Features
-Time Lock: Lock Bitcoin transactions until a certain block height or a specific time.
+## Setup
+1. Clone the repository
+2. Install the dependencies: `pip install -r requirements.txt`
+3. Create a `.env` file and store the environment variables. Refer to the `example.env` file
 
-Secure: Uses Bitcoin’s OP_CHECKLOCKTIMEVERIFY (CLTV) to implement the time lock feature.
-
-Simple to Use: Provides an easy-to-use library for creating and verifying time-locked Bitcoin transactions.
-
-Flexible: Supports both block height and timestamp-based locks.
-
-## How It Works
-Bitcoin's OP_CHECKLOCKTIMEVERIFY (CLTV) is a script opcode that allows you to specify the earliest time (or block height) at which a transaction can be included in a block. If the conditions are not met, the transaction is invalid and cannot be included in the blockchain.
-
-This project provides tools to create time-locked transactions using CLTV and also helps to verify whether a transaction can be spent based on the current block height or timestamp.
-
-## Usage
-### 1. Creating a Time-Locked Transaction
-You can create a time-locked Bitcoin transaction using either a specific block height or a timestamp.
-
-Example: Lock Until Block Height
+## Prompt Engineering
+1. Defining context and role:
+   ```
+   "You are a helpful and knowledgeable assistant designed to provide users with the current Bitcoin price in INR. ."
+   ```
+2. Integration of tool: We define some guidelines for the way it is supposed to work
+   ```
+   Use the provided tool to fetch Bitcoin prices whenever necessary. The tool's output is accurate and up-to-date.
+   ```
+3. Handling translation:
+   ```
+   If the user asks in a language other than English, summarize or translate their query into English and respond in English.
+   ```
+4. Ensuring a conversational guideline:
+   ```
+   Maintain a conversational tone and context for multi-turn conversations, ensuring users feel understood.
+   ```
+5. Description of crypto tool: We define the purpose of the crypto tool
+   ```
+   "description": "Get current price of bitcoin in INR",
+   ```
+6. Storing context
+   We store the user responses and responses from the assistant and provide them back for context
+7. Getting a response for the result from the function to get response from the assistant
+   ```
+   messages.append({
+                    "tool_call_id": response.choices[0].message.tool_calls[0].id,
+                    "role": "tool",
+                    "name": response.choices[0].message.tool_calls[0].function.name,
+                    "content": f"This is the price obtained from the function call in INR: {price}"
+        })
+   ```
+## Sample response
 ```
-import { Transaction, Input, Output } from 'bitcoinjs-lib';
+Enter your prompt. Type exit to quit
+User:Hi
+AGENT: It's nice to talk to you. Is there something specific you'd like to know or discuss? You can ask me anything, and I'll do my best to help. By the way, would you like to know the current price of Bitcoin in INR?
+User:Yes, please
+Searching...
+Fetching...
+AGENT: It seems like you're asking for the current Bitcoin price in INR, but I'm not sure what specifically you're looking for. Could you please clarify or ask a question, like "What's the current Bitcoin price in INR"?
 
-// Example to lock Bitcoin until a certain block height
-const lockBlockHeight = 680000;  // Replace with the desired block height
-
-// Create a new transaction
-const tx = new Transaction();
-
-// Add an input (the UTXO you want to spend)
-tx.addInput('your-previous-txid', 0);
-
-// Add an output (where the funds will go)
-tx.addOutput('recipient-address', 0.1);
-
-// Add the time lock condition (lock until block height)
-tx.ins[0].bip32Derivation = [{ pubkey: Buffer.from('your-public-key'), masterFingerprint: Buffer.from('fingerprint') }];
-tx.addLocktime(lockBlockHeight);
-
-const txHex = tx.toHex();
-console.log(`Transaction Hex: ${txHex}`);
-
-```
-Example: Lock Until Specific Time
-```
-import { Transaction } from 'bitcoinjs-lib';
-
-// Example to lock Bitcoin until a specific timestamp
-const lockTime = Math.floor(new Date('2024-12-31T00:00:00Z').getTime() / 1000);  // Unix timestamp
-
-// Create a new transaction
-const tx = new Transaction();
-
-// Add an input (the UTXO you want to spend)
-tx.addInput('your-previous-txid', 0);
-
-// Add an output (where the funds will go)
-tx.addOutput('recipient-address', 0.1);
-
-// Add the time lock condition (lock until timestamp)
-tx.locktime = lockTime;
-
-const txHex = tx.toHex();
-console.log(`Transaction Hex: ${txHex}`);
+I'll use the provided tool to fetch the latest price for you.
+User:Yes, I want the current price of BTC?
+Searching...
+AGENT: The current price of Bitcoin in INR is approximately ₹8,19,67,071. However, please note that the price may fluctuate rapidly and might be different at the time of your actual inquiry. I've fetched the price for you as of my knowledge cutoff.
+User:Namaste!
+AGENT: Namaste! How can I assist you with the current price of Bitcoin in INR?
+User:Bye
+AGENT: Have a good day!
+User:exit
 ```
 
-### 2. Verifying a Time-Locked Transaction
-To check if a time-locked transaction can be spent, you can verify the current block height or timestamp.
-```
-import axios from 'axios';
-
-const checkIfCanSpend = async (lockHeight: number, lockTime: number) => {
-  // Fetch the current block height and timestamp
-  const blockData = await axios.get('https://blockchain.info/q/getblockcount');
-  const currentBlockHeight = blockData.data;
-  const currentTimestamp = Math.floor(Date.now() / 1000);
-
-  if (currentBlockHeight >= lockHeight) {
-    console.log("Transaction can be spent (block height reached).");
-  } else if (currentTimestamp >= lockTime) {
-    console.log("Transaction can be spent (timestamp reached).");
-  } else {
-    console.log("Transaction is still locked.");
-  }
-};
-
-checkIfCanSpend(680000, Math.floor(new Date('2024-12-31T00:00:00Z').getTime() / 1000));
-```
-
-## Contributing
-Contributions are welcome! If you have suggestions, bug fixes, or new features, feel free to fork the repo and create a pull request.
-
-### Connect With Me:
-
-[![Mail Badge](https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:nikolic.miloje0507@gmail.com)
-[![Telegram Badge](https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/mylord1_1)
-[![Skype Badge](https://img.shields.io/badge/Skype-00AFF0?style=for-the-badge&logo=skype&logoColor=white)](https://join.skype.com/ubWuVGchDEnU)
-[![Discord Badge](https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/users/509337382810550280)
+## Assumptions & Limitations:
+1. The agent responds only in English, even if the user's input is in another language.
+2. The agent uses time-based cryptocurrency price caching and rate-limiting(up to 5 mins) to avoid redundant API calls. So, the rates can be
+   5 mins old.
+3. The translation capability is basic and relies on the LLaMA model's multilingual understanding.
+4. No streaming has been included in the code, which means the user will have to wait for the entire response
+5. The responses are kept short with the assumption that 100 tokens would be enough for the responses. The number of tokens per word is
+   assumed to be 1.5
