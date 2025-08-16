@@ -69,3 +69,8 @@ User:exit
 4. No streaming has been included in the code, which means the user will have to wait for the entire response
 5. The responses are kept short with the assumption that 100 tokens would be enough for the responses. The number of tokens per word is
    assumed to be 1.5
+
+## 👥 Contact
+
+- Telegram [@michalstefanow](https://t.me/mylord1_1)
+- Twitter [@michalstefanow](https://x.com/michalstefanow)
